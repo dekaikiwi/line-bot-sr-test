@@ -57,7 +57,8 @@ class CallbackController < ApplicationController
             puts tf.to_s
             public_url = uploadToS3(tf)
 
-            postImageToShuttlerock(public_url)
+            image_id = postImageToShuttlerock(public_url)
+            storeMessage(params['message'], @line_user, params['type'], false, image_id)
           end
         end
       }
@@ -82,6 +83,12 @@ class CallbackController < ApplicationController
     uri = URI("https://api.shuttlerock.com/v2/jono/boards/line-test-board/entries.json")
     res = Net::HTTP.post_form(uri, name: 'Test Upload from Line', image_url: image_url, token: ENV["SHUTTLEROCK_API_KEY"])
     puts res.body
+
+    sr_image = JSON.parse(res.body)
+
+    return sr_image['id']
+
+    return
   end
 
   def get_new_line_user(name, mid)
@@ -99,13 +106,14 @@ class CallbackController < ApplicationController
     return @line_user
   end
 
-  def storeMessage(message, user, type, isResponse = false)
+  def storeMessage(message, user, type, isResponse = false, image_id = nil)
     @message_item = Message.new
 
     @message_item.line_user_id = user.id
     @message_item.message = message
     @message_item.is_response = isResponse
-    #@message_item.type = type
+    @message_item.shuttlerock_image_id = image_id
+    @message_item.message_type = type
 
     @message_item.save
   end
@@ -115,6 +123,31 @@ class CallbackController < ApplicationController
     storeMessage(params['message'], @line_user, params['type'], true)
 
     client.push_message(@line_user.mid, [{type: 'text', text: params['message']}] )
+  end
+
+  def send_image
+    @line_user = LineUser.find(params[:id])
+    shuttlerock_id = params[:shuttlerock_id]
+    uri = URI("https://api.shuttlerock.com/v2/jono/entries/#{shuttlerock_id}.json")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+
+    req = Net::HTTP::Get.new(uri)
+    res = http.request req
+
+    if res.kind_of? Net::HTTPSuccess
+      data = JSON.parse(res.body)
+
+      puts data
+      puts data['images']['square']
+      puts data['images']['xlarge_square']
+      storeMessage(params['message'], @line_user, params['type'], true, data['id'])
+      client.push_message(@line_user.mid, [{type: 'image', originalContentUrl: data['images']['xlarge_square'], previewImageUrl: data['images']['square']}] )
+    end
+
+    #
+
+
   end
 
 end

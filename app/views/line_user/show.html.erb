@@ -7,11 +7,21 @@
   x
   <% end %>
   <%= m.message %> <br/>
+  <% if !m.shuttlerock_image_id.nil? %>
+    <%= link_to "Link to Image", "https://jono.shuttlerock.com/items/#{m.shuttlerock_image_id}" %> <br/>
+  <% end %>
 <% end %>
 
 <%= form_tag("/line_user/#{@line_user.id}/send_message") do %>
   <%= label_tag :message, "Message" %>
   <%= text_field_tag :message %>
   <%= hidden_field_tag :type, :text %>
+  <%= submit_tag "Submit "%>
+<% end %>
+
+<%= form_tag("/line_user/#{@line_user.id}/send_image") do %>
+  <%= label_tag :shuttlerock_id, "Shuttlerock ID" %>
+  <%= text_field_tag :shuttlerock_id %>
+  <%= hidden_field_tag :type, :image %>
   <%= submit_tag "Submit "%>
 <% end %>

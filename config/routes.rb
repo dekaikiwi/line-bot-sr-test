@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   get 'line_user/index'
   get 'line_user/:id' => 'line_user#show', as: 'line_user'
   post 'line_user/:id/send_message' => 'callback#send_message'
+  post 'line_user/:id/send_image' => 'callback#send_image'
 
   post 'callback' => 'callback#callback'
   get 'page/index'
