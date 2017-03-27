@@ -9,7 +9,7 @@ class CallbackController < ApplicationController
 
   Aws.config.update({
     region: 'us-east-1',
-    credentials: Aws::Credentials.new(ENV['AWS_TOKEN'], ENV['AWS_TOKEN_SECRET'])
+    credentials: Aws::Credentials.new(ENV['S3_TOKEN'], ENV['S3_TOKEN_SECRET'])
   })
 
   def index
