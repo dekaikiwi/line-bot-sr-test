@@ -1,0 +1,17 @@
+
+<h1><%= @line_user.username %><h1>
+
+<h3>Messages</h3>
+<% @line_user.messages.each do |m| %>
+  <% if m.is_response %>
+  x
+  <% end %>
+  <%= m.message %> <br/>
+<% end %>
+
+<%= form_tag("/line_user/#{@line_user.id}/send_message") do %>
+  <%= label_tag :message, "Message" %>
+  <%= text_field_tag :message %>
+  <%= hidden_field_tag :type, :text %>
+  <%= submit_tag "Submit "%>
+<% end %>

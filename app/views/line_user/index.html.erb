@@ -1,0 +1,17 @@
+
+<h1>Listing Line Users</h1>
+
+<table>
+  <tr>
+    <th>Username</th>
+    <th>MID</th>
+  </tr>
+
+  <% @line_users.each do |user| %>
+    <tr>
+      <td><%= user.username %></td>
+      <td><%= user.mid %></td>
+      <td><%= link_to 'Show', line_user_path(user) %></td>
+    </tr>
+  <% end %>
+</table>

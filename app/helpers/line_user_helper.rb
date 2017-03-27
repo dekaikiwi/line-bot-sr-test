@@ -1,0 +1,2 @@
+module LineUserHelper
+end
